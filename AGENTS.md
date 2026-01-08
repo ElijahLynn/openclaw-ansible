@@ -13,17 +13,20 @@ Ansible playbook for automated, hardened Clawdbot installation on Debian/Ubuntu 
 
 ## Critical Components
 
-### Firewall Order
-**Must run BEFORE Docker installation**. If Docker is installed first, there's a window where ports could be exposed.
+### Task Order
+Docker must be installed **before** firewall configuration.
 
 Task order in `roles/clawdbot/tasks/main.yml`:
 ```yaml
-- firewall.yml  # FIRST!
-- user.yml
-- docker.yml
-- nodejs.yml
-- clawdbot.yml
+- tailscale.yml  # VPN setup
+- user.yml       # Create system user
+- docker.yml     # Install Docker (creates /etc/docker)
+- firewall.yml   # Configure UFW + daemon.json (needs /etc/docker to exist)
+- nodejs.yml     # Node.js + pnpm
+- clawdbot.yml   # Container setup
 ```
+
+Reason: `firewall.yml` writes `/etc/docker/daemon.json` and restarts Docker service.
 
 ### DOCKER-USER Chain
 Located in `/etc/ufw/after.rules`. Uses dynamic interface detection (not hardcoded `eth0`).

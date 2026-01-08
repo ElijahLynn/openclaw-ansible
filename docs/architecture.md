@@ -68,17 +68,19 @@ systemd → docker compose → clawdbot container
    - Install Tailscale package
    - Display connection instructions
 
-2. **Firewall Setup** (`firewall.yml`)
-   - Install UFW
-   - Configure DOCKER-USER chain
-   - Allow SSH (22/tcp) and Tailscale (41641/udp)
-
-3. **User Creation** (`user.yml`)
+2. **User Creation** (`user.yml`)
    - Create `clawdbot` system user
 
-4. **Docker Installation** (`docker.yml`)
+3. **Docker Installation** (`docker.yml`)
    - Install Docker CE + Compose V2
    - Add user to docker group
+   - Create `/etc/docker` directory
+
+4. **Firewall Setup** (`firewall.yml`)
+   - Install UFW
+   - Configure DOCKER-USER chain
+   - Configure Docker daemon (`/etc/docker/daemon.json`)
+   - Allow SSH (22/tcp) and Tailscale (41641/udp)
 
 5. **Node.js Installation** (`nodejs.yml`)
    - Add NodeSource repository
@@ -117,11 +119,14 @@ Principle of least privilege. If container is compromised, attacker has limited 
 
 ```
 main.yml
-├── firewall.yml (FIRST - lock down before Docker)
-├── user.yml
-├── docker.yml
-├── nodejs.yml
-└── clawdbot.yml
+├── tailscale.yml (VPN setup)
+├── user.yml (create clawdbot user)
+├── docker.yml (install Docker, create /etc/docker)
+├── firewall.yml (configure UFW + Docker daemon)
+├── nodejs.yml (Node.js + pnpm)
+└── clawdbot.yml (container setup)
 ```
 
-Order matters: Firewall must be configured before Docker to prevent race conditions.
+Order matters: Docker must be installed before firewall configuration because:
+1. `/etc/docker` directory must exist for `daemon.json`
+2. Docker service must exist to be restarted after config changes
