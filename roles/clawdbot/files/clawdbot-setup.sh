@@ -94,11 +94,11 @@ INIT_EOF
 chown clawdbot:clawdbot /home/clawdbot/.clawdbot-init
 
 # Add one-time sourcing to .bashrc if not already there
-if ! grep -q '.clawdbot-init' /home/clawdbot/.bashrc; then
+grep -q '.clawdbot-init' /home/clawdbot/.bashrc 2>/dev/null || {
     echo '' >> /home/clawdbot/.bashrc
     echo '# One-time setup message' >> /home/clawdbot/.bashrc
     echo '[ -f ~/.clawdbot-init ] && source ~/.clawdbot-init' >> /home/clawdbot/.bashrc
-fi
+}
 
 # Switch to clawdbot user with login shell
 exec sudo -i -u clawdbot
