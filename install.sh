@@ -29,14 +29,14 @@ fi
 if [ "$EUID" -eq 0 ]; then
     echo -e "${GREEN}Running as root.${NC}"
     SUDO=""
-    ANSIBLE_BECOME=""
+    ANSIBLE_EXTRA_VARS="-e ansible_become=false"
 else
     if ! command -v sudo &> /dev/null; then
         echo -e "${RED}Error: sudo is not installed. Please install sudo or run as root.${NC}"
         exit 1
     fi
     SUDO="sudo"
-    ANSIBLE_BECOME="--ask-become-pass"
+    ANSIBLE_EXTRA_VARS="--ask-become-pass"
 fi
 
 echo -e "${GREEN}[1/4] Checking prerequisites...${NC}"
@@ -67,13 +67,13 @@ echo -e "${GREEN}[3/5] Installing Ansible collections...${NC}"
 ansible-galaxy collection install -r requirements.yml
 
 echo -e "${GREEN}[4/5] Running Ansible playbook...${NC}"
-if [ -n "$ANSIBLE_BECOME" ]; then
+if [ "$EUID" -ne 0 ]; then
     echo -e "${YELLOW}You will be prompted for your sudo password.${NC}"
 fi
 echo ""
 
 # Run the playbook
-ansible-playbook playbook.yml $ANSIBLE_BECOME
+ansible-playbook playbook.yml $ANSIBLE_EXTRA_VARS
 
 echo ""
 echo -e "${GREEN}[5/5] Installation complete!${NC}"

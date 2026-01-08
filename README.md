@@ -72,18 +72,19 @@ Verify: `nmap -p- YOUR_SERVER_IP` should show only port 22 open.
 ## Manual Installation
 
 ```bash
-# As root
-apt update && apt install -y ansible git
-git clone https://github.com/pasogott/clawdbot-ansible.git
-cd clawdbot-ansible
-ansible-galaxy collection install -r requirements.yml
-ansible-playbook playbook.yml
-
-# Or with sudo (non-root user)
+# Install dependencies
 sudo apt update && sudo apt install -y ansible git
+
+# Clone repository
 git clone https://github.com/pasogott/clawdbot-ansible.git
 cd clawdbot-ansible
+
+# Install Ansible collections
 ansible-galaxy collection install -r requirements.yml
+
+# Run playbook (as root or with sudo)
+# If root: ansible-playbook playbook.yml -e ansible_become=false
+# If non-root: ansible-playbook playbook.yml --ask-become-pass
 ansible-playbook playbook.yml --ask-become-pass
 ```
 
