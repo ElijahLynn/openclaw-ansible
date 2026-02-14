@@ -55,6 +55,16 @@ fi
 
 echo -e "${GREEN}[1/4] Checking prerequisites...${NC}"
 
+# Check if git is installed (needed to clone the repo)
+if ! command -v git &> /dev/null; then
+    echo -e "${YELLOW}git not found. Installing...${NC}"
+    $SUDO apt-get update -qq
+    $SUDO apt-get install -y git
+    echo -e "${GREEN}✓ git installed${NC}"
+else
+    echo -e "${GREEN}✓ git already installed${NC}"
+fi
+
 # Check if Ansible is installed
 if ! command -v ansible-playbook &> /dev/null; then
     echo -e "${YELLOW}Ansible not found. Installing...${NC}"
